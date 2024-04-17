@@ -1,35 +1,58 @@
 import React from "react";
 
 interface InputBoxProps {
-  reverse?: boolean;
+  label: string;
+  amount: number;
+  amountDisabled?: boolean;
+  currencyDisabled?: boolean;
+  onAmountChange?: (newAmount: number) => void;
+  selectedCurrency: string;
+  onCurrencyChange?: (newCurrency: string) => void;
+  currencyOptions: string[];
 }
 
-const InputBox: React.FC<InputBoxProps> = ({ reverse }) => {
-  const options = (
-    <select className="...">
-      <option value="USD">USD</option>
-      <option value="EUR">EUR</option>
-      <option value="INR">INR</option>
-    </select>
-  );
-
-  const valueDisplay = (
-    <div>
-      <h2 className="text-2xl font-bold">100</h2>
-    </div>
-  );
-
-  const conversionRate = (
-    <div>
-      <p className="text-gray-400">1 AUD = 0.66 USD</p>
-    </div>
-  );
-
+const InputBox: React.FC<InputBoxProps> = ({
+  label,
+  amount,
+  amountDisabled = false,
+  currencyDisabled = false,
+  onAmountChange,
+  selectedCurrency = "USD",
+  onCurrencyChange,
+  currencyOptions = [],
+}) => {
   return (
     <div className="my-5">
-      {reverse ? conversionRate : options}
-      {valueDisplay}
-      {reverse ? options : conversionRate}
+      <label htmlFor="" className="px-5">
+        {label}
+      </label>
+      <select
+        value={selectedCurrency}
+        onChange={(e) => onCurrencyChange && onCurrencyChange(e.target.value)}
+        disabled={currencyDisabled}
+        className="..."
+      >
+        {currencyOptions.map((currency) => (
+          <option value={currency} key={currency}>
+            {currency}
+          </option>
+        ))}
+      </select>
+      <div className="">
+        <input
+          type="number"
+          placeholder="Amount"
+          value={amount}
+          disabled={amountDisabled}
+          onChange={(e) =>
+            onAmountChange && onAmountChange(Number(e.target.value))
+          }
+          className="w-30 h-10 border rounded-lg bg-yellow-400 text-black font-bold pl-5"
+        />
+      </div>
+      <div>
+        <p className="text-gray-400">1 AUD = 0.66 USD</p>
+      </div>
     </div>
   );
 };
