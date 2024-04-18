@@ -4,57 +4,51 @@ import { MdSwapVerticalCircle } from "react-icons/md";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-// interface CurrencyRates {
-//   [key: string]: number;
-// }
-
-// interface CurrencyData {
-//   timestamp: number;
-//   base: string;
-//   success: boolean;
-//   date: string;
-//   rates: CurrencyRates;
-// }
-
 const Home = () => {
-  //const [currencyData, setCurrencyData] = useState<CurrencyData | null>(null);
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
+  const [from, setFrom] = useState("USD");
+  const [to, setTo] = useState("LKR");
   const [amount, setAmount] = useState(1);
   const [convertedAmount, setConvertedAmount] = useState(0);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [options, setOptions] = useState<{ [key: string]: number }>({});
+  const [symbols, setSymbols] = useState("");
+  const [rate, setRate] = useState()
+  const currenyOptions = Object.keys(symbols);
 
-  const currenyOptions = Object.keys(options);
-  //const currenyValues = Object.values(options);
-
-  const convert = () => {
-    const convertedAmount = amount * options[to];
-    const formatedConvertedAmount = parseFloat(convertedAmount.toFixed(2))
-    setConvertedAmount(formatedConvertedAmount);
+  const convert = async () => {
+    try {
+      const res = await axios.get(
+        `/api/getCurrencyData?from=${from}&to=${to}&amount=${amount}`
+      );
+      const conversionRate = res.data.info.rate;
+      setRate(conversionRate)
+      const convertedAmount = conversionRate * amount;
+      const formatedConvertedAmount = parseFloat(convertedAmount.toFixed(2));
+      setConvertedAmount(formatedConvertedAmount);
+      setError(false);
+    } catch (err) {
+      setError(true);
+      console.error(err);
+    }
   };
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchSymbols = async () => {
       setLoading(true);
       try {
-        const res = await axios.get("/api/getCurrencyData");
-        //setFrom(res.data.base);
-        setOptions(res.data.rates);
-        //setTo(res.data.rates[selectedCurrency])
-        //setCurrencyData(res.data);
-        setError(false);
+        const res = await axios.get("/api/getSymbols");
+        setSymbols(res.data.symbols);
       } catch (err) {
-        setError(true);
-        //setCurrencyData(null);
+        console.error(err);
         console.error(err);
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
+    fetchSymbols();
   }, []);
+
+  console.log(currenyOptions);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error</div>;
@@ -76,6 +70,9 @@ const Home = () => {
             onCurrencyChange={(currency) => setFrom(currency)}
             onAmountChange={(amount) => setAmount(amount)}
             selectedCurrency={from}
+            from={from}
+            to={to}
+            rate={rate}
           />
           <button className="">
             <MdSwapVerticalCircle className="w-10 h-10" />

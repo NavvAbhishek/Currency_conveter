@@ -9,6 +9,9 @@ interface InputBoxProps {
   selectedCurrency: string;
   onCurrencyChange?: (newCurrency: string) => void;
   currencyOptions: string[];
+  from? : string;
+  to? : string;
+  rate?: number
 }
 
 const InputBox: React.FC<InputBoxProps> = ({
@@ -20,6 +23,9 @@ const InputBox: React.FC<InputBoxProps> = ({
   selectedCurrency = "USD",
   onCurrencyChange,
   currencyOptions = [],
+  from,
+  to,
+  rate
 }) => {
   return (
     <div className="my-5">
@@ -51,7 +57,7 @@ const InputBox: React.FC<InputBoxProps> = ({
         />
       </div>
       <div>
-        <p className="text-gray-400">1 AUD = 0.66 USD</p>
+        <p className="text-gray-400">1 {from} = {rate} {to}</p>
       </div>
     </div>
   );
