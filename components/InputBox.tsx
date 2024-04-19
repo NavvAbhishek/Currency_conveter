@@ -9,9 +9,10 @@ interface InputBoxProps {
   selectedCurrency: string;
   onCurrencyChange?: (newCurrency: string) => void;
   currencyOptions: string[];
-  from? : string;
-  to? : string;
-  rate?: number
+  from?: string;
+  to?: string;
+  rate?: number;
+  bottom?: boolean;
 }
 
 const InputBox: React.FC<InputBoxProps> = ({
@@ -25,7 +26,8 @@ const InputBox: React.FC<InputBoxProps> = ({
   currencyOptions = [],
   from,
   to,
-  rate
+  rate,
+  bottom,
 }) => {
   return (
     <div className="my-5">
@@ -57,7 +59,15 @@ const InputBox: React.FC<InputBoxProps> = ({
         />
       </div>
       <div>
-        <p className="text-gray-400">1 {from} = {rate} {to}</p>
+        {bottom ? (
+          <p className="text-gray-400">
+            1 {from} = {rate} {to}
+          </p>
+        ) : (
+          <p className="text-gray-400">
+            1 {to} = {rate} {from}
+          </p>
+        )}
       </div>
     </div>
   );

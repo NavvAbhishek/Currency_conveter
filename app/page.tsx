@@ -12,7 +12,8 @@ const Home = () => {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [symbols, setSymbols] = useState("");
-  const [rate, setRate] = useState()
+  const [rate, setRate] = useState<number>(0);
+  const [belowRate, setBelowRate] = useState<number>(0);
   const currenyOptions = Object.keys(symbols);
 
   const convert = async () => {
@@ -21,9 +22,11 @@ const Home = () => {
         `/api/getCurrencyData?from=${from}&to=${to}&amount=${amount}`
       );
       const conversionRate = res.data.info.rate;
-      setRate(conversionRate)
+      setRate(conversionRate);
+      const belowConversionRate = parseFloat((1 / conversionRate).toFixed(4));
+      setBelowRate(belowConversionRate);
       const convertedAmount = conversionRate * amount;
-      const formatedConvertedAmount = parseFloat(convertedAmount.toFixed(2));
+      const formatedConvertedAmount = parseFloat(convertedAmount.toFixed(4));
       setConvertedAmount(formatedConvertedAmount);
       setError(false);
     } catch (err) {
@@ -50,6 +53,13 @@ const Home = () => {
 
   console.log(currenyOptions);
 
+  const swapButton = () => {
+    setFrom(to);
+    setTo(from);
+    setAmount(convertedAmount)
+    setConvertedAmount(amount)
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error</div>;
 
@@ -74,8 +84,8 @@ const Home = () => {
             to={to}
             rate={rate}
           />
-          <button className="">
-            <MdSwapVerticalCircle className="w-10 h-10" />
+          <button className="" onClick={swapButton}>
+            <MdSwapVerticalCircle className="w-10 h-10"  />
           </button>
           <InputBox
             label="To"
@@ -84,6 +94,10 @@ const Home = () => {
             onCurrencyChange={(currency) => setTo(currency)}
             amountDisabled
             amount={convertedAmount}
+            from={from}
+            to={to}
+            rate={belowRate}
+            bottom
           />
           <button className="" type="submit">
             Convert
